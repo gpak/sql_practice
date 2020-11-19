@@ -133,3 +133,31 @@ inner join provider_practice_table as ppt_city
 ON comp_ppt.provider_id = ppt_city.provider_id
 WHERE created > '2010-04-01'
 	AND city LIKE '% %';
+
+5.	Roger has a list of doctors on a csv file.  The file contains a column called “provider_id”.  He would like to compare that file against the provider table and see what provider_id does not exist.  How would you bring the file in the database and what query would you use on the comparison?
+
+COPY table_name
+FROM ‘C:/mydirectory/rogers_doctorfile.csv’
+WITH (FORMAT CSV, HEADER);
+
+SELCT * FROM rogerslistdr
+LEFT JOIN provider_table
+ON rogerslistdr.provider_id = provider_table.provider_id;
+
+6.	Sally is looking for a doctor who lives near her town in the Rutherford area and knows she a couple of options.  Write a query that will list the doctors in her town using a single where clause.  
+
+SELECT * 
+FROM comp_ppt
+inner join provider_practice_table as ppt_city
+ON comp_ppt.provider_id = ppt_city.provider_id
+WHERE city LIKE '%Rutherford';
+
+7.	John has come to you and noticed some of the query performance he is experiencing is extremely slow.  How would you approach this situation to figure out the performance issue? 
+
+-Check Logs for any abnormalities.
+-Explain Analze keywords in postgres to display statistics about query process and how long it took to execute.
+
+8.	Write an index using the query you compiled in question 5.
+CREATE INDEX indx_provider_id on rogerslistdr (provider_id);
+9. Please see document
+10. Please see document
