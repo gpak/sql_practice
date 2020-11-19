@@ -63,7 +63,45 @@ FROM provider_table
 ORDER BY provider_name;
 
 2.	 List out the degrees and the counts that are associated to the degree.  If the degree is listed more than twice, output ‘Popular degree’.
-SELECT prov.provider_id, prov.provider_name, prof.profession_id, prof.profession
+
+/* Check to ensure I have proper output and joins between the three tables */
+SELECT distinct(prof.profession), count(*) as counts_of_degree
+FROM provider_profession_table as ppt
+
+join provider_table as prov 
+	ON ppt.provider_id = prov.provider_id
+
+join profession_table as prof
+ON  ppt.profession_id = prof.profession_id
+
+GROUP BY prof.profession;
+
+/* Add Output for Popular degree and not so popular degree */
+SELECT distinct(prof.profession), count(*) as counts_of_degree,
+
+CASE
+	WHEN count(*) > 2 
+		THEN 'Popular degree'
+	WHEN count(*) <= 2
+		THEN 'Not Popular degree'
+END no_degrees
+
+FROM provider_profession_table as ppt
+
+join provider_table as prov 
+	ON ppt.provider_id = prov.provider_id
+
+join profession_table as prof
+ON  ppt.profession_id = prof.profession_id
+
+GROUP BY prof.profession;
+
+3.	How many providers have a profession of DO and is associated with a city that contains ‘er’ in its name?
+
+/* Created a new table */
+CREATE TABLE comp_ppt
+as
+SELECT prov.provider_id, prov.provider_name, prov.created, prof.profession_id, prof.profession
 FROM provider_profession_table as ppt
 
 join provider_table as prov 
@@ -71,3 +109,27 @@ join provider_table as prov
 
 join profession_table as prof
 ON  ppt.profession_id = prof.profession_id;
+
+/* join comp_ppt and ppt_city data */
+SELECT * 
+FROM comp_ppt 
+inner join provider_practice_table as ppt_city
+ON comp_ppt.provider_id = ppt_city.provider_id;
+
+/* final answer */
+SELECT comp_ppt.profession, count(*) 
+FROM comp_ppt 
+inner join provider_practice_table as ppt_city
+ON comp_ppt.provider_id = ppt_city.provider_id
+WHERE profession = 'DO'
+	AND city LIKE '%er%'
+group by comp_ppt.profession;
+
+4.	List all providers with their profession code created after April of 2010 and is associated with a city that has more than one word in the name.
+
+SELECT * 
+FROM comp_ppt
+inner join provider_practice_table as ppt_city
+ON comp_ppt.provider_id = ppt_city.provider_id
+WHERE created > '2010-04-01'
+	AND city LIKE '% %';
